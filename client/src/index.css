@@ -1,0 +1,686 @@
+* {
+  box-sizing: border-box;
+}
+@import url("https://fonts.googleapis.com/css?family=Rubik");
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+body {
+  font-family: "Roboto";
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0) url("herringbone.png") repeat scroll 0% 0%;
+  opacity: 0.8;
+}
+
+:root {
+  --green-color: #377d6a;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-end;
+  font-family: "Rubik";
+  font-size: 1.2rem;
+}
+
+.navbar a,
+.navbar span {
+  color: black;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.5rem;
+}
+
+.navbar a:visited {
+  color: black;
+}
+
+.navbar a.active {
+  color: var(--green-color);
+  border: 1px dashed var(--green-color);
+  border-bottom: 4px solid var(--green-color);
+}
+
+.navbar a:hover:not(.active),
+.navbar span:hover {
+  border-bottom: 4px solid black;
+}
+
+.sign-form {
+  width: 300px;
+  position: relative;
+  z-index: 20;
+  padding: 40px;
+  margin: 10px 0 30px 30px;
+  border-radius: 1rem;
+  border: 2px solid black;
+}
+
+.sign-form span.selected-option {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--green-color);
+  font-weight: bold;
+  text-decoration: underline;
+  text-decoration-color: var(--green-color);
+  text-decoration-style: solid;
+  text-decoration-thickness: 3px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.sign-form span.not-selected-option {
+  font-size: 1.2rem;
+  color: rgba(0, 0, 0, 0.671);
+}
+
+.sign-form span.not-selected-option:hover {
+  color: rgb(0, 0, 0);
+  font-size: 1.4rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: black;
+  text-decoration-style: solid;
+  text-decoration-thickness: 2px;
+}
+
+span.verticalLine {
+  border-left: 3px solid black;
+}
+
+.sign-form > span {
+  position: relative;
+  display: block;
+  margin: 30px 0;
+}
+
+.message-button {
+  outline: none;
+  padding: 0.3rem 0.5rem;
+  font-stretch: wider;
+  flex-grow: 4;
+  text-transform: uppercase;
+}
+
+.message-form {
+  display: flex;
+  flex-direction: row;
+}
+
+.gate {
+  display: inline-block;
+  width: 215px;
+  padding: 10px 0 10px 15px;
+  font-weight: 400;
+  color: black;
+  background: white;
+  border: 0;
+  border-radius: 3px;
+  outline: 0;
+  padding-left: 100px;
+  transition: all 0.3s ease-in-out;
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: rgba(26, 25, 25, 0.911);
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sign-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  padding-top: 14vh;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(211, 209, 209, 0.9);
+}
+
+/* https://codepen.io/MichaelArestad/pen/ohLIa */
+.gate::-webkit-input-placeholder {
+  color: #c4c0c0;
+  text-indent: 0;
+  font-weight: 300;
+}
+.gate + label {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px 15px;
+  color: white;
+  text-shadow: 0 1px 0 rgba(19, 74, 70, 0.4);
+  background: var(--green-color);
+  transition: all 0.4s ease-in-out;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  transform-origin: left bottom;
+  z-index: 99;
+}
+.gate + label:before,
+.gate + label:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 3px;
+  background: var(--green-color);
+  transform-origin: left bottom;
+  transition: all 0.4s ease-in-out;
+  pointer-events: none;
+  z-index: -1;
+}
+.gate + label:before {
+  background: rgba(3, 36, 41, 0.2);
+  z-index: -2;
+  right: 20%;
+}
+
+.gate:focus,
+.gate:active {
+  padding-left: 15px;
+  background: #fff;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.gate:focus::-webkit-input-placeholder,
+.gate:active::-webkit-input-placeholder {
+  color: #aaa;
+}
+.gate:focus + label,
+.gate:active + label {
+  transform: rotate(-66deg);
+  border-radius: 3px;
+}
+.gate:focus + label:before,
+.gate:active + label:before {
+  transform: rotate(10deg);
+}
+
+/* https://codepen.io/sfoxy/pen/XpOoJe */
+.btn {
+  border: none;
+  display: block;
+  text-align: center;
+  text-transform: uppercase;
+  outline: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+  color: #fff;
+  font-weight: 500;
+  background-color: #222;
+  padding: 10px 40px;
+  margin: 0 auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.sign-form-errors li {
+  color: red;
+  font-size: 12px;
+}
+
+.btn:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 500%;
+  width: 160%;
+  background: var(--green-color);
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  -webkit-transform: translateX(-98%) translateY(-25%) rotate(41deg);
+  transform: translateX(-98%) translateY(-25%) rotate(41deg);
+}
+
+.btn:hover:after {
+  -webkit-transform: translateX(-9%) translateY(-25%) rotate(45deg);
+  transform: translateX(-9%) translateY(-25%) rotate(45deg);
+}
+
+.main {
+  height: 100%;
+  position: relative;
+  max-width: 700px;
+  flex-grow: 16;
+  -webkit-box-shadow: 10px 13px 19px -6px rgba(0, 0, 0, 0.45);
+  -moz-box-shadow: 10px 13px 19px -6px rgba(0, 0, 0, 0.45);
+  box-shadow: 10px 13px 19px -6px rgba(0, 0, 0, 0.45);
+}
+
+.main-top {
+  font-family: "Rubik";
+  position: relative;
+  padding: 5px 20px;
+  height: 48px;
+  background-color: #d3cece;
+  z-index: 1;
+}
+
+.main-middle {
+  position: absolute;
+  background: rgba(0, 0, 0, 0) url("email-pattern.png") repeat scroll 0% 0%;
+  top: 0;
+  overflow: hidden;
+  left: 0;
+  padding: 39px 0px 56px 10px;
+  z-index: 0;
+  order: 2;
+  height: 100%;
+  width: 100%;
+}
+
+.messages-list {
+  position: relative;
+  margin-top: 10px;
+  padding: 10px 10px 10px 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.ovf-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.messages-list .date {
+  text-align: center;
+  padding: 14px 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 5px;
+}
+
+.messages-list .date span {
+  background: #ccf2ff;
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.main-bottom {
+  order: 3;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #d3cece;
+}
+
+.main-bottom .mask-button {
+  background: var(--green-color);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.message-form input {
+  outline: none;
+  text-align: left;
+  border-radius: 1rem;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  flex-grow: 14;
+}
+
+.sidenav {
+  height: 100%;
+  max-width: 290px;
+  position: relative;
+  -webkit-box-shadow: -7px 10px 24px -5px rgba(0, 0, 0, 0.47);
+  -moz-box-shadow: -7px 10px 24px -5px rgba(0, 0, 0, 0.47);
+  box-shadow: -7px 10px 24px -5px rgba(0, 0, 0, 0.47);
+  flex-grow: 6;
+  background-color: #f8f9fa;
+}
+.rooms-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.room-item {
+  padding: 5px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #918b8b;
+}
+
+.room-item:hover {
+  background-color: #d8d4d498;
+}
+
+.room-item.active {
+  background-color: #b6b2b2d5;
+}
+
+.room-item .title {
+  font-weight: bold;
+}
+.chat-container {
+  height: 540px;
+  width: 75%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 30px auto;
+}
+
+.search-container {
+  background-color: #d3cece;
+  padding: 6px 0px;
+  text-align: center;
+  height: 48px;
+}
+
+.sidenav input {
+  padding: 6px 10px;
+  text-indent: 10px;
+  text-align: left;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  font-size: 17px;
+  border: none;
+  max-width: 180px;
+}
+
+.sidenav .search-container button {
+  padding: 6px 10px;
+  background: #ddd;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+.topnav .search-container button:hover {
+  background: #ccc;
+}
+
+.left-message + .left-message,
+.left-message + .right-message,
+.right-message + .left-message,
+.right-message + .right-message {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.message span {
+  border-radius: 1.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 0.4rem 1.6rem 0.4rem 1rem;
+  font-size: 12px;
+  min-width: 100px;
+  display: inline-block;
+}
+
+span.left-no-radius {
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
+}
+
+span.left-no-top-radius {
+  border-top-left-radius: 0px;
+}
+
+span.left-no-bottom-radius {
+  border-bottom-left-radius: 0px;
+}
+
+span.right-no-radius {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+span.right-no-top-radius {
+  border-top-right-radius: 0px;
+}
+
+span.right-no-bottom-radius {
+  border-bottom-right-radius: 0px;
+}
+
+.right-message span {
+  background-color: var(--green-color);
+  color: white;
+  text-align: left;
+}
+
+.right-message {
+  text-align: right;
+  padding-left: 4rem;
+}
+
+.left-message {
+  color: black;
+  text-align: left;
+  opacity: 1;
+
+  padding-right: 4rem;
+}
+
+.left-message span {
+  background-color: #d8d4d498;
+  color: black;
+}
+
+.messages-list .message:last-child {
+  padding-bottom: 10px;
+}
+
+/* https://www.fabriziovanmarciano.com/button-styles/ */
+.gradient-button {
+  margin-left: 5px;
+  border-radius: 1rem;
+  background: linear-gradient(to right, #3fc246, var(--green-color)) !important;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  text-transform: uppercase;
+  transition: all 0.4s;
+  cursor: pointer;
+}
+.gradient-button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.4s;
+}
+.gradient-button span:after {
+  content: "\00bb";
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+.gradient-button:hover span {
+  padding-right: 25px;
+}
+.gradient-button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+/* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_custom_radio */
+.radio-button-container {
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.radio-button-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.radio-button-container:hover input ~ .checkmark {
+  background-color: #4cac92c5;
+}
+
+/* When the radio button is checked, add a blue background */
+.radio-button-container input:checked ~ .checkmark {
+  background-color: var(--green-color);
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.radio-button-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.radio-button-container .checkmark:after {
+  top: 9px;
+  left: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* generated by https://loading.io/ */
+
+@keyframes ldio-s6oiacdtda {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(22.5deg);
+  }
+  100% {
+    transform: rotate(45deg);
+  }
+}
+.ldio-s6oiacdtda > div {
+  transform-origin: 50px 50px;
+  animation: ldio-s6oiacdtda 0.8474576271186439s infinite linear;
+}
+.ldio-s6oiacdtda > div div {
+  position: absolute;
+  width: 19px;
+  height: 88px;
+  background: #52b548;
+  left: 50px;
+  top: 50px;
+  transform: translate(-50%, -50%);
+}
+.ldio-s6oiacdtda > div div:nth-child(1) {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+}
+.ldio-s6oiacdtda > div div:nth-child(6) {
+  width: 28px;
+  height: 28px;
+  background: #f1f2f3;
+  border-radius: 50%;
+}
+.ldio-s6oiacdtda > div div:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.ldio-s6oiacdtda > div div:nth-child(4) {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.ldio-s6oiacdtda > div div:nth-child(5) {
+  transform: translate(-50%, -50%) rotate(135deg);
+}
+.loadingio-spinner-gear-vvul4efaq8i {
+  width: 97px;
+  height: 97px;
+  display: inline-block;
+  overflow: hidden;
+  background: none;
+}
+.ldio-s6oiacdtda {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: translateZ(0) scale(0.97);
+  backface-visibility: hidden;
+  transform-origin: 0 0; /* see note above */
+}
+.ldio-s6oiacdtda div {
+  box-sizing: content-box;
+}
+
+@media screen and (min-width: 1600) {
+  .chat-container {
+    width: 1000px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .chat-container {
+    width: 85%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .chat-container {
+    width: 100%;
+  }
+}
