@@ -2,8 +2,9 @@ import React, { Component, Fragment } from "react";
 import MainContext from "../contexts/MainContext";
 import axios from "axios";
 import Loader from "./Loader";
+import { withRouter } from "react-router-dom";
 
-export default class LoginRegisterForm extends Component {
+class LoginRegisterForm extends Component {
   static contextType = MainContext;
   constructor(props) {
     super(props);
@@ -73,6 +74,9 @@ export default class LoginRegisterForm extends Component {
       const { token, user } = response.data;
       this.context.setUser(user.username);
       this.context.setAuthToken(token);
+      if (window.location.pathname.includes("private")) {
+        this.props.history.push(`/my-list/${this.props.match.id}`);
+      }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.errors) {
         this.setState({ errors: err.response.data.errors });
@@ -100,8 +104,10 @@ export default class LoginRegisterForm extends Component {
       minLength: register ? 7 : 3,
       name: "password",
     };
+
+    let showLoginRequiredMessage = this.props.location.pathname.includes("private");
     return (
-      <div className="sign-container">
+      <div className="form-container">
         <span className="close" onClick={this.showSignForm}>
           &times;
         </span>
@@ -118,11 +124,15 @@ export default class LoginRegisterForm extends Component {
           />
         )}
         <form
-          style={{ margin: "0 auto" }}
-          className="sign-form"
+          className="modal-form"
           onSubmit={this.submitForm}
         >
           <div style={{ paddingBottom: "30px", textAlign: "center" }}>
+            {showLoginRequiredMessage && (
+              <div>
+                You need to be logged in before you can accept an invitation.
+              </div>
+            )}
             {register ? (
               <Fragment>
                 <span
@@ -160,7 +170,7 @@ export default class LoginRegisterForm extends Component {
               </Fragment>
             )}
           </div>
-          <div className="sign-form-errors">
+          <div className="modal-form-errors">
             <ul>
               {errors &&
                 errors.length > 0 &&
@@ -201,3 +211,5 @@ export default class LoginRegisterForm extends Component {
     );
   }
 }
+
+export default withRouter(LoginRegisterForm);

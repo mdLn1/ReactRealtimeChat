@@ -31,6 +31,7 @@ async function createRoom(req, res) {
   } else {
     user.publicRooms.push(newRoom._id);
   }
+
   await user.save();
   await newRoom.save();
   return res.status(201).json({ room: { ...newRoom._doc } });

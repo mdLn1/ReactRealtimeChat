@@ -1,9 +1,14 @@
 import React, { Component, Fragment } from "react";
 import ChatFormat from "../components/ChatFormat";
 import MainContext from "../contexts/MainContext";
+import { withRouter } from "react-router-dom";
 
-export default class Home extends Component {
+class Home extends Component {
   static contextType = MainContext;
+  componentDidMount() {
+    const { id } = this.props.match.params;
+    if (id && !this.context.user.username) this.context.showSignForm();
+  }
   componentWillUnmount() {
     this.context.setLoading(false);
   }
@@ -16,3 +21,5 @@ export default class Home extends Component {
     );
   }
 }
+
+export default withRouter(Home);

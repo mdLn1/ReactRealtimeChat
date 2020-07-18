@@ -5,7 +5,9 @@ import RoomItem from "./RoomItem";
 import PropTypes from "prop-types";
 import axios from "axios";
 import CreateRoom from "./CreateRoom";
+import SearchBox from "./SearchBox";
 import Loader from "./Loader";
+import InviteSomeoneForm from "./InviteSomeoneForm";
 
 const pageSize = 10;
 
@@ -16,19 +18,43 @@ class ChatFormat extends Component {
     super(props);
     this.state = {
       errors: null,
-      indexActive: 0,
+      indexActive: -1,
       showRoomCreate: false,
       message: "",
       loading: false,
       pageNo: 1,
       endReached: false,
       loadingMoreMessages: false,
+      messagesCurrentlySelectedRoom: [],
+      showRoomInfo: false,
+      showInviteSomeoneForm: false
     };
+    this.messagesList = React.createRef();
+    this.searchBox = React.createRef();
   }
 
   toggleRoomCreate = () => {
     this.setState((prevState) => ({
       showRoomCreate: !prevState.showRoomCreate,
+    }));
+  };
+
+  findAndShowRoom = (roomId) => {
+    const roomIndex = this.context.chats.findIndex((el) => el._id === roomId);
+    this.context.updateRoomSearch(null);
+    this.searchBox.current.clearSearch();
+    this.fetchMessages(roomIndex);
+  };
+
+  toggleRoomInfo = () => {
+    this.setState((prevState) => ({
+      showRoomInfo: !prevState.showRoomInfo,
+    }));
+  };
+
+  toggleInviteSomeone = () => {
+    this.setState((prevState) => ({
+      showInviteSomeoneForm: !prevState.showInviteSomeoneForm,
     }));
   };
 
@@ -52,36 +78,51 @@ class ChatFormat extends Component {
       let resp = await axios.get(
         `/api/room/${this.props.type === "private" ? "private" : ""}`
       );
+      if (this.props.type === "private") {
+        this.context.setChatsType("private");
+      } else {
+        this.context.setChatsType();
+      }
       this.context.updateChats(resp.data.rooms);
-      resp = await axios.get(
-        `/api/room/${this.context.chats[this.state.indexActive]._id}`
-      );
-      this.setState({
-        messagesCurrentlySelectedRoom: resp.data.messages,
-      });
+      if (this.state.indexActive !== -1) {
+        resp = await axios.get(
+          `/api/room/${this.context.chats[this.state.indexActive]._id}`
+        );
+        this.setState({
+          messagesCurrentlySelectedRoom: resp.data.messages,
+        });
+      }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors)
+      if (error?.response?.data?.errors)
         this.setState({ errors: error.response.data.errors });
     }
     setLoading(false);
-    socket.on("relay message", ({ message, room_name }) => {
-      let { messagesCurrentlySelectedRoom, indexActive } = this.state;
-
-      let { user, chats } = this.context;
-      if (chats[indexActive].room_name !== room_name) return;
-      messagesCurrentlySelectedRoom.push(message);
-      this.setState({ messagesCurrentlySelectedRoom });
-      setTimeout(() => {
-        let el = document.getElementById("messages-container");
-        if (
-          message.author === user.username ||
-          el.scrollHeight - el.scrollTop < 700
-        )
-          el.scrollTop = el.scrollHeight + 10000;
-      }, 300);
-    });
+    socket.on("relay message", this.appendMessage);
   }
 
+  appendMessage = ({ message, room_name }) => {
+    let { messagesCurrentlySelectedRoom, indexActive } = this.state;
+    let { user, chats } = this.context;
+    if (
+      chats === null ||
+      indexActive === -1 ||
+      chats[indexActive].room_name !== room_name
+    )
+      return;
+    messagesCurrentlySelectedRoom.push(message);
+    this.setState({ messagesCurrentlySelectedRoom });
+    setTimeout(() => {
+      let el = document.getElementById("messages-container");
+      if (
+        message.author === user.username ||
+        el.scrollHeight - el.scrollTop < 700
+      )
+        el.scrollTop = el.scrollHeight + 10000;
+    }, 300);
+  };
+  componentWillMount() {
+    this.context.socket.off("relay message", this.appendMessage);
+  }
   sendMessage = async (e) => {
     e.preventDefault();
     const { indexActive, message, messagesCurrentlySelectedRoom } = this.state;
@@ -118,9 +159,9 @@ class ChatFormat extends Component {
       if (chats && chats.length > 0) {
         if (
           this.props.type === "private" &&
-          !chats[index].users.includes(user.username)
+          !chats[index].users.find((el) => el.username === user.username)
         ) {
-          console.log("You dont have access to this chat");
+          console.log("You don't have access to this chat");
           return;
         }
         const response = await axios.get(`/api/room/${chats[index]._id}`);
@@ -130,7 +171,7 @@ class ChatFormat extends Component {
         });
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors)
+      if (error?.response?.data?.errors)
         this.setState({ errors: error.response.data.errors });
     }
     this.setState({ indexActive: index, endReached: false });
@@ -175,9 +216,10 @@ class ChatFormat extends Component {
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors)
         this.setState({ errors: error.response.data.errors });
+    } finally {
+      setLoading(false);
+      this.setState({ loadingMoreMessages: false });
     }
-    setLoading(false);
-    this.setState({ loadingMoreMessages: false });
   };
 
   inputChange = (e) => {
@@ -185,13 +227,15 @@ class ChatFormat extends Component {
   };
 
   render() {
-    const { loading, chats, user } = this.context;
+    const { loading, chats, user, roomSearchResult } = this.context;
     const {
       messagesCurrentlySelectedRoom,
       indexActive,
       showRoomCreate,
       message,
       pageNo,
+      showRoomInfo,
+      showInviteSomeoneForm
     } = this.state;
     return (
       <div className="chat-container">
@@ -201,13 +245,16 @@ class ChatFormat extends Component {
             roomsType={this.props.type === "private" ? true : false}
           />
         )}
+        {showInviteSomeoneForm && (
+          <InviteSomeoneForm
+            hideForm={this.toggleInviteSomeone}
+            link={`${window.location.hostname}/private/${chats[indexActive]._id}`}
+          />
+        )}
         <div className="sidenav">
           <header>
             <div className="search-container">
-              <input type="text" placeholder="Search..." name="search" />
-              <button>
-                <i className="fa fa-search" />
-              </button>
+              <SearchBox ref={this.searchBox} />
               {user.username && (
                 <button
                   style={{ borderRadius: "7px", marginLeft: "5px" }}
@@ -245,7 +292,8 @@ class ChatFormat extends Component {
                 }}
               >
                 <div className="rooms-container">
-                  {chats &&
+                  {!roomSearchResult &&
+                    chats &&
                     chats.map((el, index) => (
                       <RoomItem
                         key={index}
@@ -256,6 +304,24 @@ class ChatFormat extends Component {
                         {...el}
                       />
                     ))}
+                  {roomSearchResult &&
+                    roomSearchResult.length > 0 &&
+                    roomSearchResult.map((el, index) => (
+                      <RoomItem
+                        key={index}
+                        index={index}
+                        indexActive={-1}
+                        user={user}
+                        setActive={() => this.findAndShowRoom(el._id)}
+                        {...el}
+                      />
+                    ))}
+                  {roomSearchResult !== null &&
+                    roomSearchResult.length === 0 && (
+                      <div style={{ textAlign: "center", paddingTop: "10px" }}>
+                        No chats were found
+                      </div>
+                    )}
                 </div>
               </div>
             ) : (
@@ -267,8 +333,8 @@ class ChatFormat extends Component {
         </div>
         <div className="main">
           <header className="main-top">
-            {chats && chats.length ? (
-              <Fragment>
+            {!roomSearchResult && chats && chats.length && indexActive > -1 ? (
+              <div style={{ position: "relative" }}>
                 <div style={{ fontWeight: "bold" }}>
                   {chats[indexActive].room_name}
                 </div>
@@ -286,7 +352,24 @@ class ChatFormat extends Component {
                       )
                     : "No participants yet"}
                 </small>
-              </Fragment>
+                <div className="menu-drop" role="button" title="Menu">
+                  <div className="dropdown">
+                    <i
+                      aria-hidden="true"
+                      className="fa fa-ellipsis-v fa-3"
+                      style={{ fontSize: "20px" }}
+                    ></i>
+                    <div className="dropdown-content">
+                      <div className="element" onClick={this.toggleRoomInfo}>
+                        Room Info
+                      </div>
+                      {user.username && this.props.type === "private" && (
+                        <div className="element" onClick={this.toggleInviteSomeone}>Invite someone</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               <div
                 style={{
@@ -313,15 +396,45 @@ class ChatFormat extends Component {
                 }}
               />
             )}
+            {showRoomInfo && (
+              <div className="room-info">
+                <h2 style={{ textAlign: "center" }}>Room info</h2>
+                <h3>Participants:</h3>
+                <div>
+                  {chats[indexActive].users.map((el, index) =>
+                    index > 0 ? `, ${el.username}` : el.username
+                  )}
+                </div>
+                <h3>Created on:</h3>
+                <div>
+                  {`${new Date(
+                    chats[indexActive].created_at
+                  ).toLocaleDateString()} at ${new Date(
+                    chats[indexActive].created_at
+                  ).toLocaleTimeString()}`}
+                </div>
+                <h3>Type:</h3>
+                <div>{chats[indexActive].private ? "Public" : "Private"}</div>
+                <span
+                  className="close"
+                  style={{ top: "-5px", right: "27px" }}
+                  onClick={this.toggleRoomInfo}
+                >
+                  &times;
+                </span>
+              </div>
+            )}
             <MessagesList
+              ref={this.messagesList}
               messages={messagesCurrentlySelectedRoom}
               loadMoreMessages={this.loadMoreMessages}
               pageNo={pageNo}
             />
           </div>
           <footer className="main-bottom">
-            {user.username ? (
-              chats[indexActive].users.find(
+            {user.username &&
+              indexActive > -1 &&
+              (chats[indexActive].users.find(
                 (el) => el.username === user.username
               ) ? (
                 <form className="message-form" onSubmit={this.sendMessage}>
@@ -349,8 +462,8 @@ class ChatFormat extends Component {
                   </span>{" "}
                   this room
                 </div>
-              )
-            ) : (
+              ))}{" "}
+            {!user.username && (
               <div style={{ textAlign: "center" }}>
                 {" "}
                 You need to{" "}

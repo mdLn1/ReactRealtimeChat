@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
 }
+
 @import url("https://fonts.googleapis.com/css?family=Rubik");
 @import url("https://fonts.googleapis.com/css?family=Roboto");
 
@@ -20,6 +21,53 @@ code {
     monospace;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 0.3rem 0;
+  z-index: 1;
+}
+
+.menu-drop:hover .dropdown-content {
+  display: block;
+  margin-top: 12px;
+}
+
+.dropdown-content .element {
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem;
+}
+
+.dropdown-content .element:hover {
+  background-color: #d8d4d498;
+}
+
+.main-top .menu-drop {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.main-top .menu-drop .dropdown {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  margin: 0 0 0.2rem 0.2rem;
+}
+
+.main-top .menu-drop .dropdown:hover {
+  background-color: rgb(184, 179, 179);
+  border-radius: 50%;
+}
+
 .navbar {
   display: flex;
   flex-wrap: wrap;
@@ -35,6 +83,7 @@ code {
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   margin: 0 0.5rem;
+  margin-bottom: 7px;
 }
 
 .navbar a:visited {
@@ -50,9 +99,10 @@ code {
 .navbar a:hover:not(.active),
 .navbar span:hover {
   border-bottom: 4px solid black;
+  margin-bottom: 3px;
 }
 
-.sign-form {
+.modal-form {
   width: 300px;
   position: relative;
   z-index: 20;
@@ -60,9 +110,10 @@ code {
   margin: 10px 0 30px 30px;
   border-radius: 1rem;
   border: 2px solid black;
+  margin: 0 auto;
 }
 
-.sign-form span.selected-option {
+.modal-form span.selected-option {
   font-size: 1.4rem;
   cursor: pointer;
   color: var(--green-color);
@@ -79,12 +130,12 @@ button {
   cursor: pointer;
 }
 
-.sign-form span.not-selected-option {
+.modal-form span.not-selected-option {
   font-size: 1.2rem;
   color: rgba(0, 0, 0, 0.671);
 }
 
-.sign-form span.not-selected-option:hover {
+.modal-form span.not-selected-option:hover {
   color: rgb(0, 0, 0);
   font-size: 1.4rem;
   cursor: pointer;
@@ -98,7 +149,7 @@ span.verticalLine {
   border-left: 3px solid black;
 }
 
-.sign-form > span {
+.modal-form>span {
   position: relative;
   display: block;
   margin: 30px 0;
@@ -148,7 +199,7 @@ span.verticalLine {
   cursor: pointer;
 }
 
-.sign-container {
+.form-container {
   position: fixed;
   left: 0;
   top: 0;
@@ -159,13 +210,29 @@ span.verticalLine {
   background-color: rgba(211, 209, 209, 0.9);
 }
 
+.modal-form .selected-option.one-option {
+  text-decoration: none;
+  cursor: default;
+}
+
+button#copy-link-invite {
+  display: inline-block;
+  font-size: 1rem;
+  border-radius: 3px;
+  border: 0;
+  outline: 0;
+  color: white;
+  background-color: var(--green-color);
+}
+
 /* https://codepen.io/MichaelArestad/pen/ohLIa */
 .gate::-webkit-input-placeholder {
   color: #c4c0c0;
   text-indent: 0;
   font-weight: 300;
 }
-.gate + label {
+
+.gate+label {
   display: inline-block;
   position: absolute;
   top: 0;
@@ -180,8 +247,9 @@ span.verticalLine {
   transform-origin: left bottom;
   z-index: 99;
 }
-.gate + label:before,
-.gate + label:after {
+
+.gate+label:before,
+.gate+label:after {
   content: "";
   position: absolute;
   top: 0;
@@ -195,7 +263,8 @@ span.verticalLine {
   pointer-events: none;
   z-index: -1;
 }
-.gate + label:before {
+
+.gate+label:before {
   background: rgba(3, 36, 41, 0.2);
   z-index: -2;
   right: 20%;
@@ -208,17 +277,20 @@ span.verticalLine {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
+
 .gate:focus::-webkit-input-placeholder,
 .gate:active::-webkit-input-placeholder {
   color: #aaa;
 }
-.gate:focus + label,
-.gate:active + label {
+
+.gate:focus+label,
+.gate:active+label {
   transform: rotate(-66deg);
   border-radius: 3px;
 }
-.gate:focus + label:before,
-.gate:active + label:before {
+
+.gate:focus+label:before,
+.gate:active+label:before {
   transform: rotate(10deg);
 }
 
@@ -245,7 +317,7 @@ span.verticalLine {
   z-index: 1;
 }
 
-.sign-form-errors li {
+.modal-form-errors li {
   color: red;
   font-size: 12px;
 }
@@ -271,6 +343,7 @@ span.verticalLine {
 
 .main {
   height: 100%;
+  width: 350px;
   position: relative;
   max-width: 700px;
   flex-grow: 16;
@@ -310,6 +383,20 @@ span.verticalLine {
   display: flex;
   flex-direction: column;
   overflow: auto;
+}
+
+.room-info {
+  position: relative;
+  margin-top: 10px;
+  padding: 10px 10px 10px 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.room-info h3 {
+  text-decoration: underline;
+  margin-bottom: 5px;
 }
 
 .ovf-txt {
@@ -371,12 +458,14 @@ span.verticalLine {
   flex-grow: 6;
   background-color: #f8f9fa;
 }
+
 .rooms-container {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: auto;
 }
+
 .room-item {
   padding: 5px 20px;
   cursor: pointer;
@@ -394,6 +483,7 @@ span.verticalLine {
 .room-item .title {
   font-weight: bold;
 }
+
 .chat-container {
   height: 540px;
   width: 75%;
@@ -435,10 +525,10 @@ span.verticalLine {
   background: #ccc;
 }
 
-.left-message + .left-message,
-.left-message + .right-message,
-.right-message + .left-message,
-.right-message + .right-message {
+.left-message+.left-message,
+.left-message+.right-message,
+.right-message+.left-message,
+.right-message+.right-message {
   margin-top: 2px;
   margin-bottom: 2px;
 }
@@ -446,9 +536,10 @@ span.verticalLine {
 .message span {
   border-radius: 1.5rem 1.5rem 1.5rem 1.5rem;
   padding: 0.4rem 1.6rem 0.4rem 1rem;
-  font-size: 12px;
+  font-size: 13px;
   min-width: 100px;
   display: inline-block;
+  max-width: 250px;
 }
 
 span.left-no-radius {
@@ -517,12 +608,14 @@ span.right-no-bottom-radius {
   transition: all 0.4s;
   cursor: pointer;
 }
+
 .gradient-button span {
   cursor: pointer;
   display: inline-block;
   position: relative;
   transition: 0.4s;
 }
+
 .gradient-button span:after {
   content: "\00bb";
   position: absolute;
@@ -531,9 +624,11 @@ span.right-no-bottom-radius {
   right: -20px;
   transition: 0.5s;
 }
+
 .gradient-button:hover span {
   padding-right: 25px;
 }
+
 .gradient-button:hover span:after {
   opacity: 1;
   right: 0;
@@ -571,12 +666,12 @@ span.right-no-bottom-radius {
 }
 
 /* On mouse-over, add a grey background color */
-.radio-button-container:hover input ~ .checkmark {
+.radio-button-container:hover input~.checkmark {
   background-color: #4cac92c5;
 }
 
 /* When the radio button is checked, add a blue background */
-.radio-button-container input:checked ~ .checkmark {
+.radio-button-container input:checked~.checkmark {
   background-color: var(--green-color);
 }
 
@@ -588,7 +683,7 @@ span.right-no-bottom-radius {
 }
 
 /* Show the indicator (dot/circle) when checked */
-.radio-button-container input:checked ~ .checkmark:after {
+.radio-button-container input:checked~.checkmark:after {
   display: block;
 }
 
@@ -608,18 +703,22 @@ span.right-no-bottom-radius {
   0% {
     transform: rotate(0deg);
   }
+
   50% {
     transform: rotate(22.5deg);
   }
+
   100% {
     transform: rotate(45deg);
   }
 }
-.ldio-s6oiacdtda > div {
+
+.ldio-s6oiacdtda>div {
   transform-origin: 50px 50px;
   animation: ldio-s6oiacdtda 0.8474576271186439s infinite linear;
 }
-.ldio-s6oiacdtda > div div {
+
+.ldio-s6oiacdtda>div div {
   position: absolute;
   width: 19px;
   height: 88px;
@@ -628,26 +727,32 @@ span.right-no-bottom-radius {
   top: 50px;
   transform: translate(-50%, -50%);
 }
-.ldio-s6oiacdtda > div div:nth-child(1) {
+
+.ldio-s6oiacdtda>div div:nth-child(1) {
   width: 72px;
   height: 72px;
   border-radius: 50%;
 }
-.ldio-s6oiacdtda > div div:nth-child(6) {
+
+.ldio-s6oiacdtda>div div:nth-child(6) {
   width: 28px;
   height: 28px;
   background: #f1f2f3;
   border-radius: 50%;
 }
-.ldio-s6oiacdtda > div div:nth-child(3) {
+
+.ldio-s6oiacdtda>div div:nth-child(3) {
   transform: translate(-50%, -50%) rotate(45deg);
 }
-.ldio-s6oiacdtda > div div:nth-child(4) {
+
+.ldio-s6oiacdtda>div div:nth-child(4) {
   transform: translate(-50%, -50%) rotate(90deg);
 }
-.ldio-s6oiacdtda > div div:nth-child(5) {
+
+.ldio-s6oiacdtda>div div:nth-child(5) {
   transform: translate(-50%, -50%) rotate(135deg);
 }
+
 .loadingio-spinner-gear-vvul4efaq8i {
   width: 97px;
   height: 97px;
@@ -655,14 +760,17 @@ span.right-no-bottom-radius {
   overflow: hidden;
   background: none;
 }
+
 .ldio-s6oiacdtda {
   width: 100%;
   height: 100%;
   position: relative;
   transform: translateZ(0) scale(0.97);
   backface-visibility: hidden;
-  transform-origin: 0 0; /* see note above */
+  transform-origin: 0 0;
+  /* see note above */
 }
+
 .ldio-s6oiacdtda div {
   box-sizing: content-box;
 }

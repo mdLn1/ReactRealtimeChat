@@ -5,7 +5,6 @@ const mongoConnect = require("./utils/mongoConnect");
 const CLIENT_ORIGIN = ["http://127.0.0.1:3000", "http://localhost:3000"];
 const cors = require("cors");
 const app = express();
-mongoConnect();
 const server = http.createServer(app);
 app.use(express.json({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
@@ -15,6 +14,7 @@ app.use(
     origin: CLIENT_ORIGIN,
   })
 );
+mongoConnect();
 
 const io = socketIO(server);
 app.set("io", io);

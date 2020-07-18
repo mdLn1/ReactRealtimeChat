@@ -15,6 +15,9 @@ class MessagesList extends Component {
       let el = document.getElementById("messages-container");
       if (prevProps.pageNo !== this.props.pageNo && el.scrollHeight - el.scrollTop < 700)
         el.scrollTop = el.scrollHeight;
+      if (prevProps.pageNo !== this.props.pageNo && el.scrollHeight - el.scrollTop > 700) {
+        el.scrollTop = (this.props.messages.length - prevProps.messages.length) * 50;
+      }
     }
   }
   render() {

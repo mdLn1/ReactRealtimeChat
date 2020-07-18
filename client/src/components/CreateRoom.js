@@ -1,13 +1,16 @@
 import React, { Component, Fragment } from "react";
 import axios from "axios";
+import MainContext from "../contexts/MainContext";
 
 export default class LoginRegisterForm extends Component {
+  static contextType = MainContext;
+
   constructor(props) {
     super(props);
 
     this.state = {
       roomName: "",
-      password: "",
+      roomPassword: "",
       privateRoom: false,
       errors: null,
     };
@@ -16,39 +19,48 @@ export default class LoginRegisterForm extends Component {
   submitForm = async (e) => {
     e.preventDefault();
     this.setState({ errors: null });
-    const { roomName, password, privateRoom } = this.state;
+    const { roomName, roomPassword, privateRoom } = this.state;
     let errors = [];
     let re = /^[a-z0-9]+$/i;
-    if (!re.test(roomName) && roomName.length > 4)
-      errors.push("Room name must contain at least 5 alphanumeric characters");
+    if (privateRoom) {
+      if (!re.test(roomName) && roomName.length > 4)
+        errors.push(
+          "Room name must contain at least 5 alphanumeric characters, no spaces nor other symbols"
+        );
+      if (roomPassword.length < 8)
+        errors.push("Password must be at least 8 characters long");
+      if (roomPassword.length > 100)
+        errors.push("Password must be no longer than 100 characters");
+    }
     if (roomName.length > 30)
       errors.push("Room name cannot be longer than 30 characters");
-    if (password.length < 8)
-      errors.push("Password must be at least 8 characters long");
-    if (password.length > 100)
-      errors.push("Password must be no longer than 100 characters");
 
     if (errors.length > 0) {
       this.setState({ errors });
       return;
     }
 
-    // this.context.setUser(username, Math.round(Math.random() * 100));
-
-    // try {
-    //   const response = await axios.post("/api/room/", {
-    //     roomName,
-    //     private: privateRoom,
-    //     password,
-    //   });
-    // if(this.props.roomType === privateRoom)
-    //  this.context.updateChats([response.data, ...this.context.chats])
-    //   console.log(response.data);
-    // } catch (err) {
-    //   if (err.response && err.response.data && err.response.data.errors) {
-    //     this.setState({ errors: err.response.data.errors });
-    //   }
-    // }
+    try {
+      const response = await axios.post("/api/room/", {
+        roomName,
+        private: privateRoom,
+        password: roomPassword,
+      });
+      let { room } = response.data;
+      room.users[0] = {
+        _id: room.users[0],
+        username: this.context.user.username,
+      };
+      if (privateRoom && this.context.chatType === "private")
+        this.context.updateChats([room, ...this.context.chats]);
+      else if (!privateRoom && this.context.chatType === "public")
+        this.context.updateChats([room, ...this.context.chats]);
+      this.props.hideForm();
+    } catch (err) {
+      if (err?.response?.data?.errors) {
+        this.setState({ errors: err.response.data.errors });
+      }
+    }
   };
 
   onRadioClick = (e) => {
@@ -64,30 +76,29 @@ export default class LoginRegisterForm extends Component {
   }
 
   render() {
-    const { errors } = this.state;
+    const { errors, privateRoom } = this.state;
 
     let roomNameProps = {
       minLength: 4,
       name: "roomName",
     };
-    let passwordProps = {
-      minLength: 7,
-      name: "password",
-    };
+    let roomPasswordProps = {};
+    if (privateRoom) {
+      roomPasswordProps = { minLength: 7, name: "roomPassword" };
+    }
     return (
-      <div className="sign-container">
+      <div className="form-container">
         <span className="close" onClick={() => this.props.hideForm()}>
           &times;
         </span>
         <form
-          style={{ margin: "0 auto" }}
-          className="sign-form"
+          className="modal-form"
           onSubmit={this.submitForm}
         >
           <div style={{ paddingBottom: "30px", textAlign: "center" }}>
-            <span className="selected-option">New Room</span>
+            <span className="selected-option  one-option">New Room</span>
           </div>
-          <div className="sign-form-errors">
+          <div className="modal-form-errors">
             <ul>
               {errors &&
                 errors.length > 0 &&
@@ -106,18 +117,20 @@ export default class LoginRegisterForm extends Component {
             />
             <label htmlFor="roomName">Name</label>
           </span>
-          <span>
-            <input
-              className="gate"
-              id="password"
-              type="password"
-              required
-              placeholder="Password"
-              onChange={this.onInputChange}
-              {...passwordProps}
-            />
-            <label htmlFor="password">Password</label>
-          </span>
+          {privateRoom && (
+            <span>
+              <input
+                className="gate"
+                id="roomPassword"
+                type="password"
+                required
+                placeholder="Password"
+                onChange={this.onInputChange}
+                {...roomPasswordProps}
+              />
+              <label htmlFor="roomPassword">Password</label>
+            </span>
+          )}
           <span>
             <label className="radio-button-container">
               Public

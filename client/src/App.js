@@ -17,9 +17,12 @@ axios.defaults.headers.post["Content-Type"] = "application/json";
 export default class App extends Component {
   state = {
     user: { username: null },
+    token: null,
     setUser: (username) => {
-      if (username === null)
+      if (username === null) {
         delete axios.defaults.headers.common["x-auth-token"];
+        this.setState({ token: null });
+      }
       this.setState({
         user: { username },
         signFormDisplayed: false,
@@ -27,6 +30,11 @@ export default class App extends Component {
     },
     setAuthToken: (token) => {
       axios.defaults.headers.common["x-auth-token"] = token;
+      this.setState({ token });
+    },
+    roomSearchResult: null,
+    updateRoomSearch: (rooms) => {
+      this.setState({ roomSearchResult: rooms });
     },
     signFormDisplayed: false,
     showSignForm: () => {
@@ -36,8 +44,12 @@ export default class App extends Component {
       }));
     },
     chats: null,
+    chatType: "public",
     updateChats: (chats) => {
       this.setState({ chats });
+    },
+    setChatsType: (type = "public") => {
+      this.setState({ chatType: type });
     },
     loading: false,
     setLoading: (val) => {
@@ -60,6 +72,9 @@ export default class App extends Component {
               {this.state.signFormDisplayed && <LoginRegisterForm />}
               <Switch>
                 <Route exact path="/">
+                  <Home />
+                </Route>
+                <Route path="/private/:id">
                   <Home />
                 </Route>
                 <Route path="/my-list">
