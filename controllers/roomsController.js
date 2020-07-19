@@ -49,8 +49,7 @@ async function authorizeRoomEntry(req, res) {
   room.users.push(user._id);
   await room.save();
   await user.save();
-  const messages = await Message.find({ room: roomId });
-  return res.status(200).json({ messages });
+  return res.status(204).json();
 }
 
 async function joinPublicRoom(req, res) {
@@ -96,7 +95,7 @@ async function getAllPublicRooms(req, res) {
 async function getUsersPrivateRooms(req, res) {
   const { id } = req.user;
   const rooms = await Room.find(
-    { private: true, users: [id] },
+    { private: true, users: id },
     "-password -private"
   ).populate("users", "-password -privateRooms -publicRooms");
   return res.status(200).json({

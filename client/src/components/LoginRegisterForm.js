@@ -32,6 +32,7 @@ class LoginRegisterForm extends Component {
   submitForm = async (e) => {
     e.preventDefault();
     this.setState({ errors: null });
+    this.context.setLoading(true);
     const { username, password, register } = this.state;
     let errors = [];
     if (register) {
@@ -60,10 +61,7 @@ class LoginRegisterForm extends Component {
       return;
     }
 
-    // this.context.setUser(username, Math.round(Math.random() * 100));
-
     try {
-      // this.setState({ loading: true });
       const response = await axios.post(
         `/api/user/${register ? "register" : "login"}`,
         {
@@ -74,15 +72,17 @@ class LoginRegisterForm extends Component {
       const { token, user } = response.data;
       this.context.setUser(user.username);
       this.context.setAuthToken(token);
-      if (window.location.pathname.includes("private")) {
-        this.props.history.push(`/my-list/${this.props.match.id}`);
+      let url = window.location.pathname;
+      if (url.includes("private")) {
+        url = url.replace("private", "confirm-room-password");
+        this.props.history.push(url);
       }
     } catch (err) {
       if (err.response && err.response.data && err.response.data.errors) {
         this.setState({ errors: err.response.data.errors });
       }
     }
-    // this.setState({ loading: false });
+    this.context.setLoading(false);
   };
 
   onInputChange = (e) => {
@@ -94,7 +94,8 @@ class LoginRegisterForm extends Component {
   }
 
   render() {
-    const { register, errors, loading } = this.state;
+    const { register, errors } = this.state;
+    const { loading } = this.context;
 
     let usernameRegisterProps = {
       minLength: register ? 5 : 3,
@@ -105,28 +106,16 @@ class LoginRegisterForm extends Component {
       name: "password",
     };
 
-    let showLoginRequiredMessage = this.props.location.pathname.includes("private");
+    let showLoginRequiredMessage = this.props.location.pathname.includes(
+      "private"
+    );
     return (
       <div className="form-container">
         <span className="close" onClick={this.showSignForm}>
           &times;
         </span>
-        {loading && (
-          <Loader
-            properties={{
-              margin: "auto",
-              position: "absolute",
-              top: "30%",
-              left: "35%",
-              marginRight: "-50%",
-              transform: 'translate("-50%", "-50%")',
-            }}
-          />
-        )}
-        <form
-          className="modal-form"
-          onSubmit={this.submitForm}
-        >
+
+        <form className="modal-form" onSubmit={this.submitForm}>
           <div style={{ paddingBottom: "30px", textAlign: "center" }}>
             {showLoginRequiredMessage && (
               <div>
@@ -170,6 +159,12 @@ class LoginRegisterForm extends Component {
               </Fragment>
             )}
           </div>
+          {loading && (
+            <div style={{ textAlign: "center" }}>
+              {" "}
+              <div className="lds-dual-ring"></div>
+            </div>
+          )}
           <div className="modal-form-errors">
             <ul>
               {errors &&

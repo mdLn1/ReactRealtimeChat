@@ -18,6 +18,7 @@ export default class App extends Component {
   state = {
     user: { username: null },
     token: null,
+    env: "dev",
     setUser: (username) => {
       if (username === null) {
         delete axios.defaults.headers.common["x-auth-token"];
@@ -75,6 +76,9 @@ export default class App extends Component {
                   <Home />
                 </Route>
                 <Route path="/private/:id">
+                  <Home />
+                </Route>
+                <Route path="/confirm-room-password/:id">
                   <Home />
                 </Route>
                 <Route path="/my-list">

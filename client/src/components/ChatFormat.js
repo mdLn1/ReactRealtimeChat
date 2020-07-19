@@ -27,7 +27,7 @@ class ChatFormat extends Component {
       loadingMoreMessages: false,
       messagesCurrentlySelectedRoom: [],
       showRoomInfo: false,
-      showInviteSomeoneForm: false
+      showInviteSomeoneForm: false,
     };
     this.messagesList = React.createRef();
     this.searchBox = React.createRef();
@@ -227,7 +227,7 @@ class ChatFormat extends Component {
   };
 
   render() {
-    const { loading, chats, user, roomSearchResult } = this.context;
+    const { loading, chats, user, roomSearchResult, env } = this.context;
     const {
       messagesCurrentlySelectedRoom,
       indexActive,
@@ -235,7 +235,7 @@ class ChatFormat extends Component {
       message,
       pageNo,
       showRoomInfo,
-      showInviteSomeoneForm
+      showInviteSomeoneForm,
     } = this.state;
     return (
       <div className="chat-container">
@@ -248,7 +248,9 @@ class ChatFormat extends Component {
         {showInviteSomeoneForm && (
           <InviteSomeoneForm
             hideForm={this.toggleInviteSomeone}
-            link={`${window.location.hostname}/private/${chats[indexActive]._id}`}
+            link={`${
+              env === "dev" ? "http://localhost:3000" : window.location.hostname
+            }/private/${chats[indexActive]._id}`}
           />
         )}
         <div className="sidenav">
@@ -364,7 +366,12 @@ class ChatFormat extends Component {
                         Room Info
                       </div>
                       {user.username && this.props.type === "private" && (
-                        <div className="element" onClick={this.toggleInviteSomeone}>Invite someone</div>
+                        <div
+                          className="element"
+                          onClick={this.toggleInviteSomeone}
+                        >
+                          Invite someone
+                        </div>
                       )}
                     </div>
                   </div>

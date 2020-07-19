@@ -16,11 +16,14 @@ class MyList extends Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     const { username } = this.context.user;
-    if (id && !username) this.props.history.replace(`/private/${id}`);
-    if(!username) this.props.history.replace("/");
+    if (id && !username) {
+      this.props.history.replace(`/private/${id}`);
+    }
+    if (!username) this.props.history.replace("/");
     if (
-      this.context?.chats?.users?.findIndex((el) => el.username === username) ===
-      -1
+      this.context?.chats?.users?.findIndex(
+        (el) => el.username === username
+      ) === -1
     ) {
       this.setState({ roomPasswordRequired: true });
     }
