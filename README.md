@@ -24,4 +24,4 @@ Once the setup is done you need to run from the repository root `npm install` th
 
 ## Image Gallery
 
-![Desktop screenshot](https://github.com/mdLn1/ReactRealtimeChat/blob/master/assets/desktop.png "web app desktop view")
+![Desktop screenshot](https://raw.githubusercontent.com/mdLn1/ReactRealtimeChat/master/assets/desktop.PNG "web app desktop view")
