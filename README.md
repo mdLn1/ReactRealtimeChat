@@ -8,7 +8,7 @@ This app is designed for desktop use only, the CSS breaks on smaller screen.
 
 Check the **About** page to find more information about the tools and resources used to build this app.
 
-You can set up different ports to run your application, for example port **8080**.
+To setup the application to properly run you need to do the following:
 
 1. You need to create a `.env` inside the project root
 
@@ -18,7 +18,9 @@ You can set up different ports to run your application, for example port **8080*
 
 4. `JWT_SECRET` it is just a string to be used for verifying the authenticity of the JSON Web Token that is part of the request from logged in users on the website
 
-5. `client/src/App.js` is the main app state storage, the state variable called "env" stores the current development environment set for development thus the value is "dev", to switch to production just change the value to anything else
+5. By default the NodeJs API runs on PORT **8080**, you can change the port by adding a variable called `PORT` inside `.env` file and set it to a port number that you want the API to run on
+
+6. `client/src/App.js` is the main app state storage, the state variable called "env" stores the current development environment set for development thus the value is "dev", to switch to production just change the value to anything else
 
 Once the setup is done you need to run from the repository root `npm install` then `npm run dev` should launch both, the React client and the NodeJs API, make sure you configured your MongoDB cluster to accept connections from your IP address whilst running the app
 
