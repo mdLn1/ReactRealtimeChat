@@ -16,14 +16,26 @@ class Home extends Component {
   componentWillUnmount() {
     this.context.setLoading(false);
   }
-  
+
+  hideEntry = () => {
+    this.props.history.replace("/");
+  };
+
+  successfullyJoinedRoom = () => {
+    this.props.history.push("/my-list/");
+  };
+
   render() {
     return (
       <div>
         {this.props.match.params.id &&
           this.props.match.url.includes("confirm-room-password") &&
           this.context.user.username && (
-            <PrivateRoomEntryForm roomId={this.props.match.params.id} />
+            <PrivateRoomEntryForm
+              roomId={this.props.match.params.id}
+              hideForm={this.hideEntry}
+              joinedRoom={this.successfullyJoinedRoom}
+            />
           )}
         <h1 style={{ textAlign: "center" }}>Public chats</h1>
         <ChatFormat />

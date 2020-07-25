@@ -24,8 +24,7 @@ export default class PrivateRoomEntryForm extends Component {
           password: this.state.password,
         }
       );
-      console.log("oy");
-      return <Redirect to="/my-list/" />;
+      this.props.joinedRoom();
     } catch (err) {
       if (err.response && err.response.data && err.response.data.errors) {
         this.setState({ errors: err.response.data.errors });
@@ -44,6 +43,9 @@ export default class PrivateRoomEntryForm extends Component {
     const { loading } = this.context;
     return (
       <div className="form-container">
+        <span className="close" onClick={() => this.props.hideForm()}>
+          &times;
+        </span>
         <form className="modal-form" onSubmit={this.accessRoom}>
           <div style={{ paddingBottom: "30px", textAlign: "center" }}>
             <span className="selected-option one-option">

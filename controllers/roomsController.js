@@ -42,8 +42,10 @@ async function authorizeRoomEntry(req, res) {
   const { roomId } = req.params;
   const { id } = req.user;
   let room = await Room.findById(roomId);
+  if (room.users.findIndex((el) => el === id) !== -1)
+    throw new HttpError("You have already joined this room!");
   if (!(await bcrypt.compare(password, room.password)))
-    throw new HttpError("Access not allowed to this room");
+    throw new HttpError("Sorry! The password you entered is incorrect!");
   let user = await User.findById(id);
   user.privateRooms.push(room._id);
   room.users.push(user._id);
