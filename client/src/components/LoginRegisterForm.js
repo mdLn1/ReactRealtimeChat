@@ -58,6 +58,7 @@ class LoginRegisterForm extends Component {
 
     if (errors.length > 0) {
       this.setState({ errors });
+      this.context.setLoading(false);
       return;
     }
 
